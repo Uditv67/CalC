@@ -104,3 +104,52 @@ clearButton.addEventListener('click', clear);
 
 // Initialize display on startup
 updateDisplay();
+
+// --- Additional DOM References ---
+const decimalButton = document.querySelector('#decimal');
+const backspaceButton = document.querySelector('#backspace');
+
+// --- 1. Decimal Handling ---
+function appendDecimal() {
+  // Reset screen if starting a new number after an operator or evaluation
+  if (shouldResetDisplay) {
+    displayValue = '0.';
+    shouldResetDisplay = false;
+    updateDisplay();
+    return;
+  }
+
+  // Prevent multiple decimal points in a single number
+  if (!displayValue.includes('.')) {
+    displayValue += '.';
+    updateDisplay();
+  }
+}
+
+// --- 2. Backspace Handling ---
+function handleBackspace() {
+  // If waiting for new input or error message shown, do nothing or reset to 0
+  if (shouldResetDisplay || displayValue === "Nice try") return;
+
+  if (displayValue.length > 1) {
+    displayValue = displayValue.slice(0, -1);
+  } else {
+    displayValue = '0';
+  }
+  updateDisplay();
+}
+
+// --- 3. Keyboard Support ---
+function handleKeyboardInput(e) {
+  if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+  if (e.key === '.') appendDecimal();
+  if (e.key === '=' || e.key === 'Enter') evaluate();
+  if (e.key === 'Backspace') handleBackspace();
+  if (e.key === 'Escape') clear();
+  if (['+', '-', '*', '/'].includes(e.key)) handleOperator(e.key);
+}
+
+// --- Attach Event Listeners ---
+decimalButton.addEventListener('click', appendDecimal);
+backspaceButton.addEventListener('click', handleBackspace);
+window.addEventListener('keydown', handleKeyboardInput);156
